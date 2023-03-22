@@ -1,15 +1,21 @@
 import { useState, useEffect } from "react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore" // getDoc pega somente de 1
-import { db, storage } from "../config/firebase";
+import { db, storage} from "../config/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from '@firebase/storage';
+import { useParams } from "react-router";
 
-export default function Modal() {
+export default function Modal({fetch}) {
+  
   
   const [showModal, setShowModal] = useState(false);
   const [img, setImg] = useState("");
   const [file, setFile] = useState("")
   const [newBookTitle, setNewBookTitle] = useState("");
   const [newBookResume, setNewBookResume] = useState("");
+  const [ progress, setProgress ] = useState(0)
+
+  const { id } = useParams();
+  const userId = id
   
   useEffect(() => {
     const uploadFile = () => {
@@ -22,7 +28,7 @@ export default function Modal() {
       (snapshot) => {
         
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
+        (setProgress(progress));
         switch (snapshot.state) {
           case 'paused':
             console.log('Upload is paused');
@@ -51,27 +57,25 @@ export default function Modal() {
         const handleAddTask = async () => {
 
           try{
-           await addDoc(collection(db, "books"), {
+            await addDoc(collection(db, "users", userId, "books"), {
               title: newBookTitle,
               text: newBookResume,
               img: img,
               Timestamp: serverTimestamp()
-            })
-            setShowModal(false)
-
-            }catch(err){
-              console.log(err)
-            }
-  
-              }
-
+            });
+            fetch()
+            setShowModal(false);
+          }catch(err){
+            console.log(err);
+          }
+        };
               
-
+      
 
   return (
     <>
       <button
-        className="bg-blue-600 text-white active:bg-blue-800 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+        className=" text-white font-semibold hover:underline hover:decoration-2 text-md ease-linear transition-all duration-150"
         type="button"
         onClick={() => setShowModal(true)}
       >
@@ -110,6 +114,7 @@ export default function Modal() {
                     <textarea onChange={(e) => setNewBookResume(e.target.value)} className="bg-slate-200 p-3 rounded-lg border-b-4 border-black w-full min-h-[200px]"placeholder="Text..."></textarea>
                  </form>
                 <input className=""type="file" onChange={(e) => setFile(e.target.files[0])}/>
+                <progress value={progress} max={100} className="rounded-sm"/>
                 </div>
                 {/*footer*/}
 
@@ -124,7 +129,7 @@ export default function Modal() {
                     Close
                   </button>
                   <button
-                    className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    className="bg-purple-700 text-white hover:bg-purple-800 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
                     onClick={handleAddTask}
                   >

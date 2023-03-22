@@ -7,6 +7,7 @@ module.exports = {
   ],
   theme: {
     extend: {
+        'boxshadowbg': 'rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset',
       screens: {
         'xsm': '300px',
       },

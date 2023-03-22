@@ -7,6 +7,7 @@ import {
 import './index.css'
 import Root from './routes/root';
 import Book from "./routes/book";
+import UserBooks from './routes/userbooks';
 
 const router = createBrowserRouter([
   {
@@ -14,8 +15,12 @@ const router = createBrowserRouter([
     element: <Root/>,
   },
   {
-    path: "book/:title/:id",
+    path: "/:uid/book/:title/:id",
     element: <Book />,
+  },
+  {
+    path: "/:id",
+    element: <UserBooks/>
   },
 ]);
 
